@@ -1,0 +1,8 @@
+{
+  "name": "arch-advisor",
+  "version": "4.1.0",
+  "description": "Interactive architecture advisor for multi-agent LLM systems. Guides through structured discovery, tension resolution, requirements stress testing, and architecture proposal. Generates C4 diagram, ADR, decision matrix, and NFR checklist. Supports post-artifact deepening on domain-specific topics.",
+  "author": {
+    "name": "Cezar"
+  }
+}

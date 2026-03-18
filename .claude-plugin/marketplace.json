@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "meus-plugins",
+  "version": "1.0.0",
+  "description": "Plugins pessoais",
+  "owner": {
+    "name": "Cezar"
+  },
+  "plugins": [
+    {
+      "name": "arch-advisor",
+      "description": "Interactive architecture advisor for multi-agent LLM systems. Guides through structured discovery, tension resolution, requirements stress testing, and architecture proposal. Generates C4 diagram, ADR, decision matrix, and NFR checklist. Supports post-artifact deepening on domain-specific topics.",
+      "version": "4.1.0",
+      "source": "./arch-advisor",
+      "category": "development"
+    }
+  ]
+}
