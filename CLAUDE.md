@@ -54,9 +54,10 @@ meus-plugins/
 4. **Phase 1.7 — Summary Review**: resumo estruturado + 2 meta-perguntas ao usuário
 5. **Phase 2 — Requirements Analysis**: padrões, ambiguidades, riscos, constraints impact
 6. **Phase 3 — Architecture Proposal**: 3 opções (MVA / Balanced / Next Scale Tier)
-7. **Phase 3.5 — Domain Deepening (silenciosa)**: invoca até 2 skills de domínio antes dos artefatos
-8. **Phase 4 — Artifact Generation**: C4 diagram, ADR, Decision Matrix, NFR Checklist; invoca explicitamente `architecture-documentation`, `observability-slo`, `testing-quality`, e `security-governance` (condicional)
-9. **Phase 5 — Refinement Loop**: Step 1 = revisão dos artefatos; Step 2 = deepening menu mapeado para skills
+7. **Phase 3.5 — Pattern Deepening (visível)**: apresenta ao usuário os padrões detectados na arquitetura escolhida; invoca `pattern-deepening` skill; produz blocos por padrão com decisões de design concretas e constraint crítico
+8. **Phase 3.6 — Domain Deepening (silenciosa)**: invoca até 2 skills de domínio antes dos artefatos
+9. **Phase 4 — Artifact Generation**: C4 diagram, ADR, Decision Matrix, NFR Checklist; invoca explicitamente `architecture-documentation`, `observability-slo`, `testing-quality`, e `security-governance` (condicional)
+10. **Phase 5 — Refinement Loop**: Step 1 = revisão dos artefatos; Step 2 = deepening menu mapeado para skills
 
 ## Estado atual e lacunas conhecidas
 
@@ -73,9 +74,14 @@ meus-plugins/
 
 ### Lacunas pendentes
 
-**Phase 3.5 não foi testada** — PRIORIDADE MÉDIA
-- A phase foi adicionada ao command mas não há execução observada que a exercite. Não se sabe se as invocações silenciosas de skills de domínio produzem diferença mensurável nos artefatos.
-- Próximo passo: rodar o caso de uso de referência e verificar no trace quais skills foram invocadas na Phase 3.5.
+**Phase 3.5 validada no caso de referência (v6) — mas flags HITL e Hybrid DE não testados** — PRIORIDADE MÉDIA
+- Caso Technical-Document-Critic-Agent não exercita `hybrid-decision-candidate` nem `hitl-candidate` — flags = false para este caso
+- Para validar os follow-ups de Grupo C (HITL) e Grupo D (Hybrid DE), é necessário um caso com ação primária "classify/transact/route" ou output com ação real no mundo
+- Sugestão de caso de teste: sistema de triagem de chamados (classify) com aprovação humana antes de executar ação (hitl) — exercitaria ambos os flags e blocos Voting+Arbiter, HITL+Checkpointing, Saga
+
+**`arch-advisor:pattern-deepening` skill invocável apenas em sessões com plugin 4.2.0 carregado desde o início**
+- Plugin atualizado manualmente no cache para 4.2.0 em 2026-03-19; nova sessão deve ter o skill disponível
+- Verificar: `/plugin install arch-advisor@meus-plugins` para garantir que 4.2.0 é a versão ativa
 
 ### O que foi validado e funciona
 
@@ -83,10 +89,11 @@ meus-plugins/
 - Stress Test calibra thresholds com dados do usuário (vs. estimativas genéricas)
 - Invocações explícitas de skills na Phase 4 produzem diferença mensurável e rastreável nos artefatos
 - Deepening menu (Phase 5 Step 2) gera detalhe de implementação que o fluxo principal não alcança
+- Phase 3.5 Pattern Deepening (v4.2.0): 4/12 blocos dispararam corretamente para o caso de referência; 8/12 silenciosos sem falsos positivos; conteúdo dos blocos é coerente e anterior aos artefatos
 
 ## Referências
 
 - `CHANGELOG.md` — histórico de versões e o que mudou em cada uma
 - `COMPARACAO-VARIANTES.md` — rubrica completa para avaliar novas versões (18 dimensões, escala /90)
-- `relatorio-comparativo-arch-advisor.md` — análise comparativa v1→v4 com scores, citações e lacunas transversais
-- Artefatos de referência: `/Users/cezargl/ai/teste-plugin/` — execuções v4-old e v4 sobre o caso Technical-Document-Critic-Agent
+- `relatorio-comparativo-arch-advisor.md` — análise comparativa v1→v6 com scores, citações e lacunas transversais
+- Artefatos de referência: `/Users/cezargl/ai/teste-plugin/` — execuções v4-old e v4; `/Users/cezargl/ai/claude-code/.claude/arch-outputs/technical-document-critic-agent/` — execução v6 (4.2.0)

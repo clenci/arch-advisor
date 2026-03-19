@@ -32,6 +32,10 @@ Ask questions **one group at a time**. Wait for all answers in a group before pr
 
 After Group A: silently analyze the domain and primary action to identify the 2–3 most architecturally consequential risks for this type of system. Use this to prioritize follow-up probing within Groups B–D. Do not announce this step.
 
+Also flag internally (do not announce):
+- If the primary action is "classify," "transact," or "route": mark `hybrid-decision-candidate = true` — probe in Group D.
+- If the primary action generates or approves outputs with real-world consequences (sends a message, triggers a payment, writes a record, updates an external system): mark `hitl-candidate = true` — probe in Group C.
+
 **Group B — Scale and Performance**
 
 4. What is the expected request volume? (requests/day, peak concurrency)
@@ -49,13 +53,21 @@ After Group B: check these conditions in order and ask the first one that applie
 
 Ask only one follow-up total. If the mandatory condition applies, ask that one and skip the conditional checks.
 
+**Additional conditional (ask only if none of the above fired):**
+- If the stated latency is "async" OR the arrival pattern is bursty OR the caller is a batch/upstream job: "Are requests processed independently the moment they arrive, or could they be held briefly — tens to hundreds of milliseconds — to be processed together as a batch?"
+
 **Group C — Data and Integrations**
 
 7. What data sources does the system need to access? (structured DBs, document repositories, external APIs, real-time streams)
 8. Are there existing systems (CRM, ERP, legacy) that must be integrated?
 9. What is the data sensitivity level? (public / internal / PII / regulated: LGPD, GDPR, HIPAA)
 
-After Group C: if integration or sensitivity requires probing, ask one targeted follow-up. Examples:
+After Group C: check these conditions in order and ask the first one that applies.
+
+**Priority follow-up (ask if `hitl-candidate = true` from Group A analysis):**
+- If the system's primary output is sent externally or triggers an action in another system: "Does that output go directly to the downstream system or recipient, or does a human need to approve it first? If approval is needed: can it happen asynchronously — the workflow pauses and waits hours or days — or must a human be in the loop in real time?"
+
+**Conditional follow-ups (if the priority condition did not apply):**
 - If legacy systems are mentioned: "Does the legacy system have a stable API, or is it volatile/undocumented?"
 - If data is PII or regulated: "Is the regulated data processed by the LLM directly, or only metadata and references?"
 
@@ -65,7 +77,12 @@ After Group C: if integration or sensitivity requires probing, ask one targeted 
 11. What is the team's familiarity with LLM/agent systems? (none / familiar / experienced)
 12. Are there compliance or audit requirements?
 
-After Group D: probe if technology constraints are underspecified. Example:
+After Group D: check these conditions in order and ask the first one that applies.
+
+**Priority follow-up (ask if `hybrid-decision-candidate = true` from Group A analysis):**
+- "For the decisions this system will make: do you have a sense of what fraction are 'obvious' cases — where the right answer is determined by a few clear signals, keywords, or rules, with no real ambiguity — versus cases that genuinely require LLM reasoning? Even a rough estimate (e.g., '70% are clear-cut, 30% are ambiguous') is useful."
+
+**Conditional follow-up (if the priority condition did not apply):**
 - If "no third-party LLMs": "Does that apply to inference only, or also to fine-tuning and embeddings?"
 
 **Group E — Failure, History, and Priorities**
@@ -74,6 +91,8 @@ After Group D: probe if technology constraints are underspecified. Example:
 14. If this system produces a wrong or low-quality output, what is the consequence? (developer wastes time reviewing / downstream system makes a bad decision / regulatory exposure / financial loss)
 15. If you had to cut one requirement to ship four weeks earlier, which would you cut?
 16. Who, outside the development team, will decide whether this system is working well enough? What will they measure?
+17. Are there multi-step operations where a failure in a later step would require undoing earlier steps? (For example: reserve inventory → charge payment → confirm order — if payment fails, inventory must be released.) If yes: is eventual consistency acceptable, or does the caller need a synchronous success-or-failure answer?
+18. Is there a requirement to reconstruct exactly what happened at any past point in time — not just the current state, but "what was the state at 3pm last Tuesday and what events caused it"? (Examples: financial audit, regulatory compliance, debugging why a specific decision was made.)
 
 ---
 
@@ -236,7 +255,52 @@ Append the chosen option (full text) to `.claude/arch-session.md` with `Status: 
 
 ---
 
-## Phase 3.5 — Domain Deepening (pre-artifact)
+## Phase 3.5 — Pattern Deepening
+
+Use the Skill tool to invoke `arch-advisor:pattern-deepening`.
+
+Then scan the chosen option's Patterns Applied section and the session answers for each trigger below. For each pattern whose trigger condition is met, produce a deepening block using the corresponding block from the `pattern-deepening` skill. Skip patterns whose trigger condition is not met — do not produce empty or generic blocks.
+
+**Trigger mapping:**
+
+| Pattern | Trigger condition |
+|---|---|
+| Hybrid Decision Engine | `hybrid-decision-candidate = true` (set in Group A) AND/OR Group D answer indicated a meaningful fraction of obvious/deterministic cases |
+| Planner-Executor-Critic (PEC) | Chosen option includes reflection loop, iteration loop, or multi-stage quality assessment |
+| Voting + Arbiter | Chosen option includes multiple agents producing independent assessments or a consensus mechanism |
+| Saga with Compensation | Group E Q17 answer indicated yes to multi-step rollback |
+| Human-in-the-Loop with Checkpointing | Group C HITL follow-up answer indicated async approval is needed |
+| Complexity-based LLM Routing | Chosen option mentions model routing, cost optimization, or multiple model tiers |
+| LLM Response Caching | Cost is a hard constraint AND requests are deterministic (same input can recur) |
+| Bulkhead | Chosen option includes multiple agent pools with different criticality levels |
+| Anti-Corruption Layer (ACL) | Legacy systems declared in Group C AND chosen option includes legacy integration |
+| Strangler Fig | Legacy migration is part of the chosen option scope |
+| Batch Processing | Group B batch follow-up answer indicated batching is viable OR chosen option mentions batch inference |
+| Feedback Loop with Regression Detection | Chosen option includes quality monitoring, eval pipeline, or continuous improvement |
+
+**Output format for each triggered pattern:**
+
+```
+### Pattern: [Pattern Name]
+
+**Why this system needs it**
+[One sentence tying the pattern to a specific answered requirement or resolved tension.]
+
+**Key design decisions for this system**
+[3–5 bullet points — concrete decisions with specific values or constraints, not generic principles. Reference the user's own answers where possible.]
+
+**Critical implementation constraint**
+[One sentence naming the single thing that, if done wrong, breaks this pattern.]
+
+**Handoff to artifacts**
+[One line: which NFR metric this pattern generates, and which artifact section it affects.]
+```
+
+Append all triggered pattern blocks to `.claude/arch-session.md` under `### Pattern Deepening`. Then proceed to Phase 3.6.
+
+---
+
+## Phase 3.6 — Domain Deepening (pre-artifact)
 
 Before generating artifacts, identify which domain skills are directly relevant to the chosen architecture. Invoke at most 2 — the ones whose knowledge will most concretely improve the artifacts. Do not invoke skills for domains not present in the chosen architecture.
 
@@ -441,9 +505,10 @@ The user may request multiple deepenings sequentially. When they are done:
 
 - Never propose an architecture without stating its trade-offs.
 - The three architectural options must always cover the minimum viable / balanced / next scale tier spectrum. Never propose three options of similar complexity.
-- Ask one focused question at a time. The only exceptions are Phase 1.6 (three stress test questions asked together) and Group E (four questions asked together).
+- Ask one focused question at a time. The only exceptions are Phase 1.6 (three stress test questions asked together) and Group E (questions asked together).
 - When a tension is resolved by the user in Phase 1.5, reference the accepted consequence explicitly when justifying the chosen architecture in Phase 3 and in the ADR justification in Phase 4.
-- The skills in this plugin are loaded automatically as the conversation progresses. Do not announce skill consultation — except in Phase 4 (explicit Skill tool invocations) and Phase 5 Step 2 (deepening menu, where the skill mapping is visible to the user). Phase 3.5 domain deepening is silent — apply it without announcing it.
+- The skills in this plugin are loaded automatically as the conversation progresses. Do not announce skill consultation — except in Phase 3.5 (Pattern Deepening, which is announced and visible to the user), Phase 4 (explicit Skill tool invocations), and Phase 5 Step 2 (deepening menu). Phase 3.6 Domain Deepening is silent — apply it without announcing it.
+- Phase 3.5 Pattern Deepening produces output the user sees: present the triggered pattern blocks after the option is confirmed. Use the standard block format. Only produce blocks for triggered patterns — never produce a block for a pattern that was not triggered by a discovery answer or the chosen option.
 - If the user introduces a new requirement mid-session that changes the analysis, acknowledge it, update the session file, and re-run the affected phase before continuing.
 - If the latency target and the number of sequential LLM calls are incompatible, name the incompatibility, quantify the gap, and ask the user to choose: accept the higher latency, reduce the pipeline, or accept lower quality with fewer calls.
 - Always cross-reference resolved tensions when choosing which option to recommend if the user is undecided — the consequence they accepted is the most reliable signal for architectural preference.

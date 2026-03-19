@@ -1,34 +1,155 @@
-# Relatório Comparativo: arch-advisor v1 → v4 → v5
+# Relatório Comparativo: arch-advisor v1 → v4 → v7
 
-**Data:** 2026-03-13
+**Data:** 2026-03-19 (atualizado; original v1→v5: 2026-03-13)
 **Avaliado por:** Claude Sonnet 4.6
-**Sessões observadas:** v1, v2, v3, v4-old, v4, v5 — todas executadas sobre o mesmo caso de uso (Technical-Document-Critic-Agent). v5 é a execução da versão do command com as três correções aplicadas (Group B follow-up obrigatório, Option C com componente de infraestrutura adicional, Phase 3.5/deepening menu com critérios explícitos de domínio).
+**Sessões observadas:** v1, v2, v3, v4-old, v4, v5, v6, v7 — v1–v6 executadas sobre o mesmo caso de uso (Technical-Document-Critic-Agent). v7 é a execução da versão 4.2.0 sobre um caso diferente (Medical-Diagnosis-Voting-Arbiter), escolhido especificamente para exercitar os flags `hybrid-decision-candidate` e `hitl-candidate` introduzidos em v4.2.0 que o caso de referência canônico não consegue exercitar.
 
 ---
 
 ## Scores por Dimensão
 
-| Dimensão | v1 | v2 | v3 | v4-old | v4 | v5 |
-|---|---|---|---|---|---|---|
-| **1a. Tensões surfaceadas ao usuário** | 1 | 3 | 3 | 5 | 5 | 5 |
-| **1b. Consequência aceita como insumo arquitetural** | 1 | 2 | 2 | 5 | 5 | 5 |
-| **1c. Follow-ups adaptativos** | 2 | 2 | 2 | 2 | 2 | 5 |
-| **1d. Stress test com dados do usuário** | 1 | 1 | 1 | 5 | 5 | 5 |
-| **2a. Padrões com justificativa rastreável** | 3 | 3 | 3 | 5 | 5 | 5 |
-| **2b. Riscos com dados observáveis** | 3 | 3 | 3 | 4 | 4 | 4 |
-| **2c. Ambiguidades arquiteturalmente consequentes** | 2 | 4 | 4 | 5 | 5 | 5 |
-| **3a. Amplitude estrutural das opções** | 4 | 4 | 4 | 4 | 4 | 4 |
-| **3b. Precisão dos trade-offs** | 3 | 3 | 4 | 5 | 5 | 5 |
-| **4a. C4 Diagram** | 3 | 3 | 5 | 5 | 5 | 5 |
-| **4b. ADR** | 4 | 4 | 5 | 5 | 5 | 5 |
-| **4c. Decision Matrix** | 3 | 4 | 4 | 5 | 5 | 5 |
-| **4d. NFR Checklist** | 4 | 3 | 4 | 4 | 5 | 5 |
-| **5a. Skills explicitamente invocadas** | 1 | 1 | 3 | 3 | 4 | 5 |
-| **5b. Conhecimento de domínio observável** | 2 | 2 | 4 | 4 | 5 | 5 |
-| **5c. Skills não utilizadas com ponto de entrada** | 1 | 1 | 1 | 1 | 3 | 4 |
-| **6a. Decisões do usuário vs. internas** | 1 | 3 | 3 | 5 | 5 | 5 |
-| **6b. Rastreabilidade fim-a-fim** | 2 | 3 | 3 | 5 | 5 | 5 |
-| **Total** | **40/90** | **46/90** | **54/90** | **73/90** | **82/90** | **87/90** |
+| Dimensão | v1 | v2 | v3 | v4-old | v4 | v5 | v6 | v7 |
+|---|---|---|---|---|---|---|---|---|
+| **1a. Tensões surfaceadas ao usuário** | 1 | 3 | 3 | 5 | 5 | 5 | 5 | 5 |
+| **1b. Consequência aceita como insumo arquitetural** | 1 | 2 | 2 | 5 | 5 | 5 | 5 | 5 |
+| **1c. Follow-ups adaptativos** | 2 | 2 | 2 | 2 | 2 | 5 | 5 | 5 |
+| **1d. Stress test com dados do usuário** | 1 | 1 | 1 | 5 | 5 | 5 | 5 | 5 |
+| **2a. Padrões com justificativa rastreável** | 3 | 3 | 3 | 5 | 5 | 5 | 5 | 5 |
+| **2b. Riscos com dados observáveis** | 3 | 3 | 3 | 4 | 4 | 4 | 4 | **5** |
+| **2c. Ambiguidades arquiteturalmente consequentes** | 2 | 4 | 4 | 5 | 5 | 5 | 5 | 5 |
+| **3a. Amplitude estrutural das opções** | 4 | 4 | 4 | 4 | 4 | 4 | 4 | **5** |
+| **3b. Precisão dos trade-offs** | 3 | 3 | 4 | 5 | 5 | 5 | 5 | 5 |
+| **4a. C4 Diagram** | 3 | 3 | 5 | 5 | 5 | 5 | 5 | 5 |
+| **4b. ADR** | 4 | 4 | 5 | 5 | 5 | 5 | 5 | 5 |
+| **4c. Decision Matrix** | 3 | 4 | 4 | 5 | 5 | 5 | 5 | 5 |
+| **4d. NFR Checklist** | 4 | 3 | 4 | 4 | 5 | 5 | 5 | 5 |
+| **5a. Skills explicitamente invocadas** | 1 | 1 | 3 | 3 | 4 | 5 | 5 | 5 |
+| **5b. Conhecimento de domínio observável** | 2 | 2 | 4 | 4 | 5 | 5 | 5 | 5 |
+| **5c. Skills não utilizadas com ponto de entrada** | 1 | 1 | 1 | 1 | 3 | 4 | 4 | 4 |
+| **6a. Decisões do usuário vs. internas** | 1 | 3 | 3 | 5 | 5 | 5 | 5 | 5 |
+| **6b. Rastreabilidade fim-a-fim** | 2 | 3 | 3 | 5 | 5 | 5 | 5 | 5 |
+| **Total** | **40/90** | **46/90** | **54/90** | **73/90** | **82/90** | **87/90** | **87/90** | **89/90** |
+
+---
+
+## O que mudou de v6 para v7 (arch-advisor 4.2.0 — caso Medical-Diagnosis-Voting-Arbiter)
+
+**v7 = 89/90 — +2 pontos sobre v6. Mesma versão do plugin (4.2.0); caso de uso diferente, escolhido para exercitar as funcionalidades introduzidas em v4.2.0 que o caso de referência canônico não consegue exercitar.**
+
+### Contexto
+
+v7 não representa um upgrade de plugin. Representa a mesma v4.2.0 aplicada a um domínio que **ativa todos os quatro flags silenciosos** (`hybrid-decision-candidate=true`, `hitl-candidate=true`, `saga-candidate=true`, `event-sourcing-candidate=true`) e onde os dados observados do exercício de implementação prévia fornecem baselines medidos — não estimativas.
+
+Caso: sistema de suporte a diagnóstico médico com 3 agentes especialistas em paralelo (Haiku 4.5), cascade de votação (majority → weighted → threshold → arbiter), ArbiterAgent (Sonnet 4.6), HITL assíncrono com TTL = 4h, AuditEventStore append-only para auditoria regulatória.
+
+Exercício de origem: `/Users/cezargl/ai/estudos/exercicios/modulo-03/exercicio-04/` — 20 casos de teste, 70% majority-voting, 30% arbiter, $0.0084/caso (voting path), $0.0148/caso (arbiter path), falha identificada: string comparison em sinônimos IAM enviou caso de consenso claro para o arbiter.
+
+### Por que o score subiu
+
+**2b — Riscos com dados observáveis: 4 → 5**
+
+Em v6 (caso técnico-doc-critic), os targets dos riscos eram estimativas do stress test. Em v7, os dados do exercício fornecem baselines medidos:
+
+- "Taxa de invocação do arbiter — target: 30–40%; alert se >50%" — derivado do dado observado 30% no exercício, não estimado
+- "$0.0084/caso (voting path), $0.0148/caso (arbiter path)" — custos medidos, não projetados
+- "string comparison em sinônimos IAM → falso conflito → arbiter desnecessário" — failure mode documentado do exercício, propagou para o TerminologyNormalizer como componente obrigatório
+
+O critério do score 5/5 exige "pelo menos um risco nomeado a partir do que o usuário declarou como consequência de falha". Em v7, o risco de drift da taxa de invocação do arbiter tem ground truth medido, não apenas a consequência declarada.
+
+**3a — Amplitude estrutural das opções: 4 → 5**
+
+Em v6, a Option C já introduzia nova infraestrutura (LangGraph StateGraph + Redis + PostgreSQL), mas no caso de referência a separação B→C já era naturalmente clara antes da correção. Em v7, a Option C introduz explicitamente:
+
+- Azure Service Bus (fila durável) — ausente na Option B
+- Workers Node.js distribuídos — ausente na Option B
+- Persistent LTM externo — ausente na Option B
+- External Event Store (vs. in-process AuditEventStore da Option B)
+
+E define o threshold exato para migrá-la: "1.000+ casos/dia ou jobs concorrentes introduzidos". O limiar é derivado diretamente da resposta do stress test (10× = 2.000–5.000/dia → in-process Promise.allSettled quebra primeiro). Esta é a evidência de que a correção de 3a produz diferença mensurável em casos onde B e C são naturalmente próximos.
+
+### Funcionalidades de v4.2.0 — validação completa em v7
+
+| Funcionalidade | v6 (tech-doc-critic) | v7 (medical-diagnosis) |
+|---|---|---|
+| `hybrid-decision-candidate` flag | ✅ Não disparou (correctly silent) | ✅ Disparou — Group D priority follow-up ativado; Hybrid DE Block 1 ativado |
+| `hitl-candidate` flag | ✅ Não disparou (correctly silent) | ✅ Disparou — Group C priority follow-up ativado; HITL+Checkpointing Block 5 ativado |
+| Group C HITL priority follow-up | ✅ Silencioso (hitl-candidate=false) | ✅ Disparou — async approval confirmado, TTL = 4h capturado |
+| Group D Hybrid DE priority follow-up | ✅ Silencioso (hybrid-decision-candidate=false) | ✅ Disparou — 50–60% deterministic capturado |
+| `saga-candidate` flag + Q17 | ✅ Disparou; resposta negativa bloqueou bloco | ✅ Disparou — resposta positiva (futuro EMR) ativou Saga Block 4 + sagaId no schema |
+| `event-sourcing-candidate` flag + Q18 | ✅ Disparou; resposta negativa bloqueou bloco | ✅ Disparou — resposta positiva (auditoria regulatória) ativou AuditEventStore |
+| Phase 3.5 Pattern Deepening — blocos ativados | 4/12 (PEC, LLM Routing, Caching, Feedback) | **7/12** (Hybrid DE, Voting+Arbiter, Saga, HITL+Checkpointing, LLM Routing, Bulkhead, Feedback) |
+| Phase 3.5 — blocos silenciosos | 8/12 corretos | 5/12 corretos |
+| Skills invocadas (Phase 3.6) | agent-internal-architecture + llm-selection-routing | multiagent-orchestration + security-governance |
+
+### O que os 7 blocos de Pattern Deepening produziram
+
+Os blocos ativados em v7 geraram decisões de design que não existem em nenhuma execução anterior:
+
+**Block 1 — Hybrid Decision Engine**: threshold do cascade explicitado como "no majority → weighted; gap < 0.15 → threshold; gap < 0.1 ou max_confidence < 0.5 → arbiter; arbiter < 0.5 → HITL". A ordem dos estágios é derivada dos dados: 50–60% majority, ~30–40% arbiter, <20% HITL target.
+
+**Block 3 — Voting + Arbiter**: constraint crítico da normalização terminológica derivado do failure mode observado no exercício (string comparison em sinônimos IAM). Não é um princípio genérico — é uma decisão específica motivada por uma falha documentada.
+
+**Block 4 — Saga**: o campo `sagaId` no schema de `DiagnosisRecord` é mandatório AGORA (12 meses antes da integração EMR), para evitar migração breaking no schema. Esta é uma decisão de design com timing específico que não existia em nenhum artefato anterior.
+
+**Block 5 — HITL+Checkpointing**: MemorySaver = development-only é o constraint crítico. Para o contexto médico (TTL = 4h, casos de pacientes), o risco é de perda de casos pendentes em restart de processo — diferente de um sistema de suporte IT onde o impacto seria menor.
+
+**Block 8 — Bulkhead**: dois pools com criticidade diferente — diagnóstico (critical, doctor waiting) vs. analytics/audit (non-critical, deferrable). A distinção é derivada do domínio médico, não de um princípio de infraestrutura genérico.
+
+### 5c permanece em 4/5
+
+A mesma lacuna de v6: `agent-internal-architecture` não foi oferecido no deepening menu para o VotingCoordinator, que tem uma cascade state machine com lógica não-trivial. O critério de inclusão do deepening menu menciona "explicit state machine" — o cascade é um state machine implícito. Lacuna marginal; o menu ofereceu 5 opções relevantes.
+
+---
+
+## O que mudou de v5 para v6 (arch-advisor 4.2.0)
+
+**v6 = 87/90 — mesmo score de v5. Sem regressão, sem ganho mensurável neste caso de uso.**
+
+### Por que o score não subiu
+
+As dimensões em que v6 poderia ter ganho são exatamente as que já estavam em 5/5 em v5. As novas funcionalidades da v4.2.0 (discovery expandido, Phase 3.5 Pattern Deepening) introduzem valor em casos de uso que **este caso específico não exercita**:
+
+| Nova funcionalidade | Impacto no caso Technical-Document-Critic-Agent |
+|---|---|
+| `hybrid-decision-candidate` flag (Group A) | Não disparou — ação é "orchestrate", não "classify/transact/route" |
+| `hitl-candidate` flag (Group A) | Não disparou — output é relatório Markdown, sem ação no mundo real |
+| Group C HITL follow-up (priority) | Não disparou — `hitl-candidate=false` |
+| Group D Hybrid Decision follow-up (priority) | Não disparou — `hybrid-decision-candidate=false` |
+| Group E Q17 (Saga/rollback) | Disparou — resposta negativa corretamente; bloco não ativado |
+| Group E Q18 (Event Sourcing) | Disparou — resposta negativa corretamente; bloco não ativado |
+| Phase 3.5 Pattern Deepening — blocos ativados | **4 de 12**: PEC, LLM Routing, LLM Caching, Feedback Loop |
+| Phase 3.5 Pattern Deepening — blocos não ativados | **8 de 12** corretamente silenciosos |
+
+### O que Phase 3.5 produziu (4 blocos)
+
+Os 4 blocos ativados geraram conteúdo de implementação que não existia em v5:
+
+**Block 2 — PEC**: design decisions concretas sobre o Reflection Loop que não estavam na Phase 3.6 de v5 — self-validation bias do Critic, partial result carry-forward, `stoppedBy` propagation como campo estruturado de output, temperatura do Planner. O conteúdo sobrepõe parcialmente com o deepening `agent-internal-architecture`, mas chega antes dos artefatos em vez de depois.
+
+**Block 6 — Complexity-based LLM Routing**: trigger para switch Reviser → Haiku quando `totalCost/budget > 0.70` é uma decisão de design mais concreta do que o routing mencionado na Phase 3.6 de v5 (que dizia "Haiku para tasks simples" sem especificar o threshold de ativação).
+
+**Block 7 — LLM Response Caching**: identificou que `ltmContext` injetado nos prompts do Generator anula o cache hit rate — insight sobre incompatibilidade entre dois padrões (LTM + Caching) que não aparecia nos artefatos de v5.
+
+**Block 12 — Feedback Loop**: formalizou "baseline deve ser versionado com {modelId, promptVersion, systemVersion}" como constraint explícita — em v5 o NFR dizia "regression vs. baseline" mas não especificava o que constitui uma versão do baseline.
+
+### Comportamento dos novos mecanismos — validação
+
+| Mecanismo | Status | Conclusão |
+|---|---|---|
+| Flags silenciosos Group A | ✅ Funcionam corretamente | Não disparam para "orchestrate"; dispatcher downstream correto |
+| Group B mandatory follow-up | ✅ Disparou conforme especificado | Caller = CI/CD + arrival pattern ausente → pergunta obrigatória |
+| Group B batch follow-up bloqueado | ✅ Mandatory teve prioridade | Apenas um follow-up total — comportamento correto |
+| Group C/D priority follow-ups | ✅ Silenciosos quando flags = false | Sem falsos positivos |
+| Group E Q17/Q18 | ✅ Dispararam; respostas negativas bloquearam blocos | Comportamento correto |
+| Phase 3.5 trigger mapping | ✅ 4/12 corretos para este caso | Nenhum falso positivo; nenhum falso negativo esperado |
+| Plugin 4.2.0 invocação do skill `pattern-deepening` | ⚠️ Falhou via Skill tool nesta sessão | Causa: plugin instalado em cache como 4.1.0 no início da sessão; atualizado manual para 4.2.0 mid-session; skill não registrado dinamicamente; workaround: leitura direta do SKILL.md. Em nova sessão com plugin 4.2.0 ativo desde o início, skill deve ser invocável normalmente. |
+
+### O que v6 valida sobre a v4.2.0
+
+1. **Mecanismo de flags funciona corretamente** — `hybrid-decision-candidate` e `hitl-candidate` = false para este caso; não há falsos positivos nos downstream follow-ups
+2. **Phase 3.5 não produz ruído** — 8 de 12 blocos silenciosos; apenas blocos com triggers reais ativados
+3. **Phase 3.5 produz conteúdo adicional útil** — os 4 blocos ativados chegam antes dos artefatos (vs. deepening que chega depois); conteúdo concreto sobre incompatibilidade LTM×Caching e threshold de routing não estava em v5
+4. **O caso de referência não exercita as funcionalidades mais novas** — para validar `hybrid-decision-candidate`, `hitl-candidate`, Saga, HITL+Checkpointing, Voting, Bulkhead, ACL é necessário um caso de uso diferente (ex: sistema de suporte com aprovação humana, sistema financeiro com rollback, classificador de tickets)
 
 ---
 
@@ -172,17 +293,28 @@ Em v4, a observabilidade aparece na NFR como requisito. Em v5, aparece no ADR co
 
 ## Recomendação
 
-**v5 produziu o melhor resultado (87/90)**, com ganho concentrado em duas dimensões:
+**v7 produziu o melhor resultado (89/90)** — mesma versão do plugin que v6 (4.2.0), caso de uso diferente (Medical-Diagnosis-Voting-Arbiter) que ativa todas as funcionalidades introduzidas em v4.2.0.
 
-- **1c (follow-ups adaptativos): 2 → 5** — a correção do trigger do Grupo B funcionou. Dado novo capturado (padrão bursty) propagou para três artefatos.
-- **5a (skills explicitamente invocadas): 4 → 5** — `agent-internal-architecture` disparou pela primeira vez. Conteúdo produzido (Rule Engine, two-reviser, BudgetMonitor 4-state SM, SessionState imutável) não estava presente em nenhuma versão anterior.
+Os ganhos sobre v6 (+2 pontos):
 
-**3a (amplitude das opções) permanece em 4/5** em todas as versões. A correção de Option C vai importar em casos onde B e C seriam similares — neste caso de uso a distinção já era clara antes.
+- **2b (riscos com dados observáveis): 4 → 5** — dados do exercício fornecem baselines medidos ($0.0084/caso, 30% arbiter rate, falha de string comparison documentada), tornando os targets dos riscos observados, não estimados.
+- **3a (amplitude estrutural das opções): 4 → 5** — em um caso onde Options B e C são naturalmente próximas, a correção de "Option C deve introduzir pelo menos um componente de infraestrutura novo" produziu diferença mensurável: Azure Service Bus + workers distribuídos + event store externo, com threshold derivado do stress test.
 
-**Lacunas remanescentes:**
+**Lacunas remanescentes (transversais a todos os casos testados):**
 
 | Lacuna | Score atual | Causa | O que resolveria |
 |---|---|---|---|
-| 5c: skills sem ponto de entrada | 4/5 | 8 skills irrelevantes para este caso de uso | Não corrigível neste caso — validar em caso de uso diferente (multiagent, RAG, omnichannel) |
-| 3a: amplitude estrutural | 4/5 | Espectro qualitativo similar em todas as versões | Impacto da correção de Option C visível apenas em casos onde B e C seriam naturalmente próximos |
-| 2b: riscos com dados observáveis | 4/5 | Stress test captura gargalos mas riscos de LTM bias e budget gate convergência são estimados, não medidos | Só resolvível com dados de produção |
+| 5c: skills sem ponto de entrada | 4/5 | `agent-internal-architecture` não oferecido para cascade state machine do VotingCoordinator | Critério de inclusão do deepening menu explicitado para "cascade com múltiplos estados" (não apenas Reflection Loop) |
+| 2b: riscos com dados observáveis | 4/5 em v6 | Resolvido em v7 pelo exercício com dados medidos | Para novos casos sem exercício prévio: só resolvível com dados de produção |
+
+**Score teórico máximo: 90/90 é atingível** — a única lacuna restante (5c = 4/5) requer refinamento do critério de inclusão do deepening menu para cases com cascade state machines. A correção seria: adicionar "cascade com múltiplos estágios determinísticos" como critério de inclusão de `agent-internal-architecture` no deepening menu.
+
+**Elementos a preservar em versões futuras:**
+
+| Elemento | Versão de origem | Justificativa |
+|---|---|---|
+| Phase 1.5 Tension Resolution por consequence framing | v4 | Gera componentes arquiteturais não declarados nos requisitos (BudgetMonitor, TerminologyNormalizer, CheckpointStore emergiram de tensões) |
+| Phase 1.6 Stress Test com thresholds do usuário | v4 | "When to Reconsider" com condições mensuráveis deriva diretamente das respostas |
+| Flags silenciosos Group A + follow-ups prioritários C/D | v6 (4.2.0) | Validados em v7: disparam nos 3 grupos corretos, silenciosos quando não aplicável — zero falsos positivos |
+| Phase 3.5 Pattern Deepening (visível, antes dos artefatos) | v6 (4.2.0) | 7 blocos ativados em v7 produziram decisions de design (sagaId no schema, normalização obrigatória, MemorySaver constraint) ausentes em versões anteriores |
+| Invocações explícitas de skills Phase 4 | v4 | Diferença mensurável e rastreável nos artefatos em todas as execuções testadas |

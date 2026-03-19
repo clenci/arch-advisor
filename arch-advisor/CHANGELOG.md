@@ -1,5 +1,16 @@
 # Changelog — arch-advisor
 
+## 4.2.0
+
+- Discovery — Group A: added silent internal flags (`hybrid-decision-candidate`, `hitl-candidate`) seeded from primary action analysis; used as triggers for targeted follow-ups in Groups C and D
+- Discovery — Group B: added conditional follow-up for batch processing viability (fires when latency is async, arrival is bursty, or caller is a batch/upstream job)
+- Discovery — Group C: added priority HITL follow-up (fires when `hitl-candidate = true`); distinguishes sync vs. async approval — async approval triggers HITL+Checkpointing pattern in Phase 3.5
+- Discovery — Group D: added priority Hybrid Decision Engine follow-up (fires when `hybrid-decision-candidate = true`); probes fraction of obvious/deterministic cases to determine whether Rule Engine → LLM Reasoner → Heuristic Validator is warranted
+- Discovery — Group E: added questions 17 (Saga/compensation — multi-step rollback need) and 18 (Event Sourcing — time-travel audit requirement)
+- Phase 3.5 — Pattern Deepening (NEW): visible phase presented to user after architecture option is chosen; scans discovery answers and chosen option for 12 pattern triggers; invokes `arch-advisor:pattern-deepening` skill; produces per-pattern blocks with "why this system needs it," concrete design decisions, critical implementation constraint, and artifact handoff note; appends to arch-session.md
+- Phase 3.6 — Domain Deepening: renamed from previous Phase 3.5; behavior unchanged (silent, pre-artifact, up to 2 domain skills)
+- New skill `arch-advisor:pattern-deepening`: 12 implementation-level pattern blocks covering Hybrid Decision Engine, Planner-Executor-Critic, Voting + Arbiter, Saga with Compensation, Human-in-the-Loop with Checkpointing, Complexity-based LLM Routing, LLM Response Caching, Bulkhead, Anti-Corruption Layer, Strangler Fig, Batch Processing, Feedback Loop with Regression Detection
+
 ## 4.1.0
 
 - Group B follow-up: replaced conditional `"if any answer is underspecified"` with an explicit mandatory check — if the caller is an external system or automated process and the arrival pattern (steady vs. bursty) was not explicitly stated, the follow-up is required regardless of how detailed the answer was
