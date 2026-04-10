@@ -1,5 +1,11 @@
 # Changelog — arch-advisor
 
+## 4.3.0
+
+- Phase 3.6 — `agent-internal-architecture` trigger: expanded to cover VotingCoordinator, cascade strategy with multiple deterministic stages, and any component with a multi-stage deterministic pipeline — not only single agents with reflection loops or explicit state machines
+- Phase 5 — deepening menu `Agent internal design` criterion: same expansion applied — now includes cascade strategies and multi-stage deterministic coordinators as qualifying conditions
+- CLAUDE.md: updated to v4.2.0 state; resolved lacunas marked; single remanescente lacuna (5c) documented; scores table added; casos-de-referencia/ referenced
+
 ## 4.2.0
 
 - Discovery — Group A: added silent internal flags (`hybrid-decision-candidate`, `hitl-candidate`) seeded from primary action analysis; used as triggers for targeted follow-ups in Groups C and D

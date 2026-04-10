@@ -307,7 +307,7 @@ Before generating artifacts, identify which domain skills are directly relevant 
 Invoke based on what is present in the chosen option:
 
 - Multi-agent coordination, inter-agent communication, or parallel agent execution → `arch-advisor:multiagent-orchestration`
-- Single agent with complex internal structure: perception/decision separation, reflection loop, multiple memory layers (STM/LTM), explicit state machine, or budget-controlled iteration → `arch-advisor:agent-internal-architecture` — invoke this whenever a Reflection Loop or multi-stage internal pipeline is part of the chosen architecture
+- Single agent or coordinator with complex internal structure: perception/decision separation, reflection loop, multiple memory layers (STM/LTM), explicit state machine, budget-controlled iteration, VotingCoordinator or cascade strategy with multiple deterministic stages, or any component with a multi-stage deterministic pipeline → `arch-advisor:agent-internal-architecture`
 - Document retrieval, semantic search, knowledge base lookup, or embeddings in the data flow → `arch-advisor:rag-strategy`
 - Model selection decisions, routing between models by cost or capability, or multi-provider fallback → `arch-advisor:llm-selection-routing`
 - Framework choice that has not been settled (LangChain, LangGraph, CrewAI, custom) is architecturally significant for this system → `arch-advisor:llm-frameworks`
@@ -461,7 +461,7 @@ If no: move to the next artifact.
 
 Inclusion criteria (show the option if the condition is true):
 - **Agent coordination**: multiple agents, inter-agent communication, or parallel execution is present
-- **Agent internal design**: the chosen architecture includes a reflection loop, multi-stage internal pipeline, STM/LTM memory layers, explicit state machine, or budget-controlled iteration — include this whenever the agent has non-trivial internal structure, not only when there are multiple agents
+- **Agent internal design**: the chosen architecture includes a reflection loop, multi-stage internal pipeline, STM/LTM memory layers, explicit state machine, budget-controlled iteration, a VotingCoordinator or cascade strategy with multiple deterministic stages, or any internal component with a multi-stage deterministic pipeline — include this whenever the agent or coordinator has non-trivial internal structure, not only when there are multiple agents
 - **Retrieval strategy**: document retrieval, semantic search, or embeddings appear in the data flow
 - **Model selection**: routing between models by cost or capability, or multi-provider fallback is present
 - **Framework evaluation**: framework choice (LangChain, LangGraph, etc.) has not been settled and is architecturally significant
