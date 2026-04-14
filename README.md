@@ -19,7 +19,7 @@ The advisor runs a 10-phase structured session: **Discovery** (5 groups of quest
 ### Stable (from GitHub)
 
 ```
-/plugin marketplace add https://github.com/cezarlenci/arch-advisor
+/plugin marketplace add https://github.com/clenci/arch-advisor
 /plugin install arch-advisor@arch-advisor
 ```
 
