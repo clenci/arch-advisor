@@ -15,3 +15,9 @@ dist/
 # Environment
 .env
 .env.*
+
+# arch-advisor session pointer (generated at runtime)
+.claude/arch-advisor/
+
+# Development planning files
+plans/

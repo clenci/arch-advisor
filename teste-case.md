@@ -1,100 +1,142 @@
-# Roteiro refinado de respostas para o /arch-advisor
+# Test case script — /arch-advisor
+
+Use these pre-written responses to run a reproducible session against the Technical Document Critic Agent use case.
+When prompted for a project name at session start, enter: `document-critic-agent`
+
+---
 
 ## Group A — Domain and Purpose
 
-1.  O sistema recebe um documento técnico (Markdown) e produz um relatório de análise crítica — classificando tipo e domínio, avaliando profundidade, completude, clareza e acionabilidade, e refinando o relatório iterativamente até atingir qualidade aceitável. Resolve a revisão técnica manual de documentação de software.
-2.  Primariamente outros sistemas (pipeline de CI/CD, ferramentas de repositório) que invocam o agente programaticamente via agent.analyze(). Desenvolvedores consomem o relatório Markdown gerado — sem interface interativa em tempo de execução.
-3.  Orchestrate + generate: orquestra um pipeline sequencial de 4 camadas (Perception → Decision → Memory → Reflection) e produz um relatório de análise crítica como output principal.
+**Q1. What problem does this system solve?**
+The system receives a technical document (Markdown) and produces a critical analysis report — classifying type and domain, evaluating depth, completeness, clarity, and actionability, and iteratively refining the report until acceptable quality is reached. It solves the problem of manual technical documentation review in software teams.
+
+**Q2. Who are the end users?**
+Primarily other systems (CI/CD pipelines, repository tooling) that invoke the agent programmatically via `agent.analyze()`. Developers consume the generated Markdown report — no interactive interface at runtime.
+
+**Q3. What is the primary action the system takes?**
+Orchestrate + generate: orchestrates a sequential 4-layer pipeline (Perception → Decision → Memory → Reflection) and produces a critical analysis report as its primary output.
+
+---
 
 ## Group B — Scale and Performance
 
-4.  Baixo volume: dezenas de documentos por dia, sem concorrência. Caso de uso típico: análise antes de merge (1–5 docs/hora por equipe). O módulo menciona escalar para 1.000 docs/dia como melhoria futura — não é requisito atual.
-5.  Async — minutos. O pipeline executa 4–7 chamadas LLM em série (classify + generate + 1–3× [critique + revise]). Latência observada: 30s–3min por documento. Não há requisito de resposta em tempo real.
-6.  Hard constraint: budget fixo de $0.30 por análise. O agente interrompe o Reflection Loop quando o budget é atingido (stoppedBy: "costBudget"). Custo real observado: $0.09–$0.15 por análise completa com 3 iterações.
+**Q4. What is the expected request volume?**
+Low volume: tens of documents per day, no concurrency. Typical use case: analysis before merge (1–5 docs/hour per team). The module mentions scaling to 1,000 docs/day as a future improvement — not a current requirement.
+
+**Q5. What is the acceptable response latency?**
+Async — minutes. The pipeline executes 4–7 LLM calls in series (classify + generate + 1–3× [critique + revise]). Observed latency: 30s–3min per document. No real-time response requirement.
+
+**Q6. Is cost per request a hard constraint or a soft budget item?**
+Hard constraint: fixed budget of $0.30 per analysis. The agent stops the Reflection Loop when the budget is reached (`stoppedBy: "costBudget"`). Actual observed cost: $0.09–$0.15 per complete analysis with 3 iterations.
+
+**Group B mandatory follow-up — arrival pattern:**
+> The caller is a CI/CD pipeline (external automated system), so the plugin will ask whether volume is steady or bursty.
+
+*Response:* Bursty — spikes tied to CI/CD events (commit, PR open, merge). During a sprint, a team might submit 10–20 documents in 30 minutes around a release, then nothing for hours.
+
+---
 
 ## Group C — Data and Integrations
 
-7.  Arquivos locais: documentos Markdown em disco (implementado) - LTM em memória: análises anteriores indexadas por domínio para enriquecer o relatório atual (implementado) - Previsto no módulo, não implementado: URLs, PDF, HTML — o módulo especificava múltiplos formatos e ChromaDB/SQLite; a implementação simplificou para Markdown + LTM in-memory
-8.  Nenhum. O agente é autônomo. Integração com CI/CD acontece na camada de invocação externa, fora do escopo do agente.
-9.  Internal: documentação técnica de software (arquiteturas, padrões, decisões de design). Sem PII, sem dados regulados por LGPD/GDPR/HIPAA.
+**Q7. What data sources does the system need to access?**
+Local files: Markdown documents on disk (implemented). In-memory LTM: previous analyses indexed by domain to enrich the current report (implemented). Planned but not implemented: URLs, PDF, HTML — the module specified multiple formats and ChromaDB/SQLite; the implementation simplified to Markdown + in-memory LTM.
+
+**Q8. Are there existing systems that must be integrated?**
+None. The agent is autonomous. CI/CD integration happens in the external invocation layer, outside the agent's scope.
+
+**Q9. What is the data sensitivity level?**
+Internal: technical software documentation (architectures, patterns, design decisions). No PII, no data regulated by LGPD/GDPR/HIPAA.
+
+---
 
 ## Group D — Constraints and Team
 
-10. Linguagem: TypeScript + Node.js - LLM: Anthropic Claude via proxy corporativo (CI&T Flow) — sem acesso direto à API pública - Modelos disponíveis: Claude Sonnet 4.6 (padrão) e Haiku 4.5 (rápido/barato) - Sem vector store externo: o módulo previa ChromaDB/Pinecone, mas a implementação usa word-overlap in-memory para manter zero dependências externas além do LLM - Sem banco de dados: o módulo previa SQLite; implementação simplificou para memória runtime
-11. Experienced: o sistema será construído num guia de estudos de Principal Architect de IA — o objetivo explícito era dominar os padrões Reflection Loop, LTM, pipeline multi-camada e design patterns (Strategy, Chain of Responsibility, State Machine).
-12. Nenhum. Ambiente de desenvolvimento/estudos. O módulo exigia logging estruturado e trace ID por questão de observabilidade interna, não por compliance regulatório.
+**Q10. Are there technology constraints?**
+Language: TypeScript + Node.js. LLM: Anthropic Claude via corporate proxy (no direct access to the public API). Available models: Claude Sonnet 4.6 (default) and Haiku 4.5 (fast/cheap). No external vector store: the module planned ChromaDB/Pinecone, but the implementation uses word-overlap in-memory to keep zero external dependencies beyond the LLM. No database: the module planned SQLite; the implementation simplified to runtime memory.
 
-## Tensões que o plugin vai identificar — e como responder
+**Q11. What is the team's familiarity with LLM/agent systems?**
+Experienced: the system is being built as part of a Principal AI Architect study guide — the explicit goal was to master Reflection Loop, LTM, multi-layer pipeline, and design patterns (Strategy, Chain of Responsibility, State Machine).
 
-### Tensão esperada: LTM in-memory não persiste entre processos
+**Q12. Are there compliance or audit requirements?**
+None. Development/study environment. The module required structured logging and trace IDs for internal observability, not regulatory compliance.
 
-> Aceito conscientemente. O módulo previa SQLite + ChromaDB; simplifiquei para focar nos padrões de memória, não na infraestrutura. Para produção, a interface AnalysisLTM suporta troca sem alterar o pipeline.
+---
 
-### Tensão esperada: 4–7 chamadas LLM sequenciais vs. latência
+## Group E — Failure, History, and Priorities
 
-> Aceito. O requisito é async. O Reflection Loop tem budget e iterações máximas como válvulas de segurança.
+**Q13. Has this system (or something similar) been attempted before? If yes: what failed or was abandoned, and why?**
+Yes — a simpler version was attempted without the Reflection Loop, using a single LLM call to generate the full report. It was abandoned because output quality was inconsistent: the report would miss critical gaps in documents that appeared well-structured on the surface. The multi-stage pipeline was introduced specifically to address this.
 
-### Tensão esperada: Word-overlap pode falhar em termos multilíngues
+**Q14. If this system produces a wrong or low-quality output, what is the consequence?**
+Developer wastes time reviewing a flawed report. In the worst case, a low-quality document passes review because the agent missed the gaps. No financial loss or regulatory exposure — this is an internal tooling system.
 
-> Risco real baixo: o espaço de domínios é controlado pelo classifier (valores como 'arquitetura de software', não queries livres de usuário).
+**Q15. If you had to cut one requirement to ship four weeks earlier, which would you cut?**
+The LTM enrichment. The core value is in the Reflection Loop and the per-document quality assessment. The LTM adds marginal improvement (cross-document pattern recognition) but is not critical for the initial use case.
 
-### Tensão esperada: Perception limitada a Markdown vs. requisito de múltiplos formatos
+**Q16. Who, outside the development team, will decide whether this system is working well enough? What will they measure?**
+The team lead reviewing pull requests. They will measure whether the agent catches the same issues a senior engineer would flag — specifically: undocumented assumptions, missing NFRs, and vague "why" sections in ADRs.
 
-> Escopo reduzido deliberadamente. O módulo previa TXT/PDF/HTML/URL; a implementação priorizou as camadas Decision, Memory e Reflection — que eram o foco pedagógico do módulo.
+**Q17. Are there multi-step operations where a failure in a later step would require undoing earlier steps?**
+No. Each analysis is an isolated read-only operation — no writes to external systems, no reservations, no transactions. If the pipeline fails mid-way, the partial report is simply discarded and the job is re-run. No rollback required.
 
-## Ambiguidades — e como responder
+**Q18. Is there a requirement to reconstruct exactly what happened at any past point in time?**
+No strict audit requirement. The structured logs with trace IDs are for debugging purposes (why did the agent score this document 0.62?), not for regulatory reconstruction. Replay capability would be nice-to-have but is not a current requirement.
 
-### A1 — Persistência da LTM
+---
 
-O agente é invocado como um processo de longa duração (servidor/daemon que recebe múltiplos documentos) ou como processo efêmero (um processo novo por análise, padrão em jobs CI/CD)?
-Se efêmero, a LTM in-memory reinicia a cada chamada e não agrega valor — isso é um risco arquitetural crítico.
+## Phase 1.5 — Tensions to expect and how to respond
 
-#### Resposta preparada
+### Expected tension: In-memory LTM does not persist between processes
 
-> O agente é longa duração dentro de uma sessão: DocumentAnalysisAgent é instanciado uma vez em main() e o loop for (const doc of documents) reutiliza a mesma instância — o LTM acumula entre análises do mesmo run. Cada processo novo começa com LTM vazio. Portanto: efêmero entre processos, persistente dentro do processo. Em uso real como job CI/CD (um processo por commit), o LTM só tem valor se múltiplos documentos forem analisados no mesmo job — o que é o caso no run.ts (2 docs com domínio sobrepostos). Para persistência cross-run, seria necessário serializar o LTM em disco.
+> Accepted consciously. The module planned SQLite + ChromaDB; I simplified to focus on memory patterns, not infrastructure. For production, the `AnalysisLTM` interface supports swapping without changing the pipeline.
 
-### A2 — Condição de parada do Reflection Loop
+### Expected tension: 4–7 sequential LLM calls vs. latency target
 
-O loop para apenas quando o budget é atingido ou o contador chega a 3, ou existe uma condição de qualidade — o agente de critique pode sinalizar "sem mais revisões necessárias" antes de atingir o
-limite?
+> Accepted. The requirement is async. The Reflection Loop has a budget ceiling and a maximum iteration count as safety valves.
 
-#### Resposta preparada
+### Expected tension: Word-overlap may fail on multilingual terms
 
-> Existem três condições de parada implementadas, em ordem de verificação:
+> Low real-world risk: the domain space is controlled by the classifier (values like 'software architecture', not free-form user queries).
+
+### Expected tension: Perception limited to Markdown vs. multi-format requirement
+
+> Deliberately reduced scope. The module planned TXT/PDF/HTML/URL; the implementation prioritized the Decision, Memory, and Reflection layers — which were the pedagogical focus.
+
+---
+
+## Phase 2 — Ambiguities to expect and how to respond
+
+### A1 — LTM persistence model
+
+*Is the agent invoked as a long-running process (server/daemon receiving multiple documents) or as an ephemeral process (a new process per analysis, standard in CI/CD jobs)?*
+
+> The agent is long-running within a session: `DocumentAnalysisAgent` is instantiated once in `main()` and the `for (const doc of documents)` loop reuses the same instance — the LTM accumulates across analyses in the same run. Each new process starts with an empty LTM. So: ephemeral across processes, persistent within a process. In real CI/CD use (one process per commit), the LTM only adds value if multiple documents are analyzed in the same job — which is the case in `run.ts` (2 docs with overlapping domains). For cross-run persistence, the LTM would need to be serialized to disk.
+
+### A2 — Reflection Loop stopping condition
+
+*Does the loop stop only when the budget is reached or the counter hits 3, or is there a quality condition — can the critic signal "no further revisions needed" before hitting the limit?*
+
+> Three stopping conditions are implemented, checked in order:
+> 1. Quality threshold (`isAcceptable = overallScore >= 0.78`) — the loop exits early if the score is already sufficient (log: "Threshold reached")
+> 2. Budget exhausted (`totalCost >= $0.30`) — interrupts before a revision iteration
+> 3. Maximum iterations (`MAX_ITERATIONS = 3`) — absolute limit
 >
-> 1.  Threshold de qualidade (isAcceptable = overallScore >= 0.78) — o loop para cedo se o score já é suficiente (log: "Threshold atingido")
-> 2.  Budget esgotado (totalCost >= $0.30) — interrompe antes de uma iteração de revisão
-> 3.  Máximo de iterações (MAX_ITERATIONS = 3) — limite absoluto
->
-> O critic sim sinaliza qualidade aceitável via critique.isAcceptable, e isso é a condição de saída prioritária — não é apenas contador/budget.
+> The critic does signal acceptable quality via `critique.isAcceptable`, and that is the primary exit condition — not just a counter or budget check.
 
-### A3 — Contrato de extensibilidade do Perception Stage
+### A3 — Perception stage extensibility contract
 
-Os formatos futuros (URL, PDF, HTML) precisam de um ponto de extensão formal (interface adapter) no design atual, ou são tratados como completamente fora de escopo e o pipeline pode assumir
-Markdown como único input?
+*Do future formats (URL, PDF, HTML) need a formal extension point (adapter interface) in the current design, or are they treated as completely out of scope and the pipeline can assume Markdown as the only input?*
 
-#### Resposta preparada
+> No formal adapter interface. The perception layer consists of two exported functions in `perception.ts`: `loadDocument(filePath): string` and `chunkDocument(content): Chunk[]`. There is no `SourceLoader` or `FormatAdapter` interface. Markdown is the only supported format — `loadDocument` uses `readFileSync` directly. Adding PDF/URL would require refactoring to a Strategy pattern, which does not exist today. The plugin will identify this as an extensibility gap.
 
-> Sem interface formal de adapter. A camada de percepção é composta por duas funções exportadas em perception.ts: loadDocument(filePath): string e chunkDocument(content): Chunk[]. Não há interface
->
-> SourceLoader ou FormatAdapter. Markdown é o único formato suportado — loadDocument usa readFileSync direto. Para adicionar PDF/URL, seria necessário refatorar para um padrão Strategy, o que não existe hoje. O plugin vai identificar isso como gap de extensibilidade.
+### A4 — Cost tracking
 
-### A4 — Rastreamento de custo
+*Is the per-LLM-call cost obtained via token count in the API response (post-call), via a pre-call estimate, or via fixed allocation per stage (e.g., classify=Haiku, generate=Sonnet)?*
 
-O custo por chamada LLM é obtido via contagem de tokens na resposta da API (post-call), por estimativa pré-chamada, ou por alocação fixa por stage (ex: classify=Haiku, generate=Sonnet)?
+> Post-call via the API's usage object. Every component that calls the LLM (classifier, report-generator, critic, reviser) calculates cost after receiving the response using `response.usage.input_tokens` and `response.usage.output_tokens` with hard-coded prices ($3.00/M input, $15.00/M output — Sonnet prices). The orchestrator accumulates `totalCost += componentCost`. No pre-call estimate, no fixed allocation — the calculation is always exact, based on real tokens consumed.
 
-#### Resposta preparada
+### A5 — Output schema
 
-> Post-call via usage da API. Todo componente que chama o LLM (classifier, report-generator, critic, reviser) calcula o custo após receber a resposta usando response.usage.input_tokens e
-> response.usage.output_tokens com preços fixos hard-coded ($3.00/M input, $15.00/M output — preços do Sonnet). O orquestrador acumula em totalCost += componentCost. Não há estimativa pré-call nem
-> alocação fixa por stage — o cálculo é sempre exato, baseado nos tokens reais consumidos.
+*Is the generated report schema fixed (predefined sections: Summary, Issues, Recommendations) or dynamic — determined by the type/domain of the document classified in the first stage?*
 
-### A5 — Contrato de output
-
-O schema do relatório gerado é fixo (seções predefinidas: Summary, Issues, Recommendations) ou dinâmico — determinado pelo tipo/domínio do documento classificado na primeira stage?
-
-#### Resposta preparada
-
-> Schema fixo com conteúdo dinâmico. As seções são predefinidas no prompt do ReportGenerator: ### Sumário, ### Pontos Fortes, ### Gaps e Problemas, ### Recomendações, ### Score de Qualidade. O tipo
-> e domínio (vindos do classifier) influenciam o conteúdo dessas seções (via focusAreas e ltmContext injetados no prompt), mas não a estrutura. O schema é um Markdown de texto livre — não há parsing
-> estruturado do output, o reportMarkdown é string bruta.
+> Fixed schema with dynamic content. The sections are predefined in the ReportGenerator prompt: `### Summary`, `### Strengths`, `### Gaps and Issues`, `### Recommendations`, `### Quality Score`. The document type and domain (from the classifier) influence the content of those sections (via `focusAreas` and `ltmContext` injected into the prompt), but not the structure. The schema is free-form Markdown — there is no structured output parsing; `reportMarkdown` is a raw string.

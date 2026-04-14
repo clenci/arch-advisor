@@ -1,5 +1,20 @@
 # Changelog — arch-advisor
 
+## 5.0.0
+
+### Session Repository refactor
+
+- **Session State**: removed dependency on `.claude/arch-session.md` (global append-only log). All session data now lives in `arch-advisor/<session-slug>/`, a self-contained versioned directory per session.
+- **Project naming**: at session start, user is asked for a short project name used as the folder slug (e.g., `payment-processor`). Fallback: `session-<YYYYMMDD-HHmm>`. `argument-hint` updated to `[resume <slug>|new]`.
+- **Lightweight pointer**: `.claude/arch-advisor/session.md` now holds only `path`, `title`, `status`, and `date` — no session data. Updated on Phase 1.7, Phase 3 option choice, Phase 4, and Phase 5 completion.
+- **Incremental writes**: `arch-advisor/<session-slug>/session.md` is written from the start and appended after each group (A–E), Phase 1.5 tension, Phase 1.6 stress test, and each subsequent phase.
+- **New artifacts**: `requirements.md` and `tradeoffs.md` created at Phase 1.7 and progressively updated through Phase 3. `README.md` created as placeholder at Phase 1.7 and completed at Phase 4.
+- **Phase 4 paths**: all four artifacts (`container-diagram.md`, `adr-001-<slug>.md`, `decision-matrix.md`, `nfr-checklist.md`) now written to `arch-advisor/<session-slug>/` instead of `.claude/arch-outputs/`.
+- **Phase 4 README update**: after writing artifacts, `README.md` is populated with Overview, Architecture Artifacts links, Key Decisions table, Top Risks table, and When to Revisit triggers.
+- **Phase 5 paths**: deepening documents (`deepening-<topic>.md`) written to `arch-advisor/<session-slug>/`; `README.md` updated after each deepening.
+- **session_start.py**: rewritten to read the lightweight pointer at `.claude/arch-advisor/session.md` (O(1) read, no directory scan). Verifies session directory exists; injects resume prompt or missing-directory warning.
+- **allowed-tools**: added `Bash(mv:*)` to support slug-directory rename when fallback timestamp slug is used.
+
 ## 4.3.0
 
 - Phase 3.6 — `agent-internal-architecture` trigger: expanded to cover VotingCoordinator, cascade strategy with multiple deterministic stages, and any component with a multi-stage deterministic pipeline — not only single agents with reflection loops or explicit state machines
