@@ -36,7 +36,10 @@ arch-advisor/
 │   │   └── session_start.py
 │   └── CHANGELOG.md
 ├── COMPARACAO-VARIANTES.md       ← comparative evaluation rubric (18 dimensions, /90)
-└── teste-case.md                 ← canonical test case (Technical-Document-Critic-Agent)
+└── test-cases/                   ← three scripted test cases for reproducible sessions
+    ├── 01-support-routing-agent.md     ← hybrid+HITL flags, PII/SOC2, saga=no, event-sourcing=no
+    ├── 02-medical-research-assistant.md← no flags, HIPAA/RAG, saga=no, event-sourcing=yes
+    └── 03-fraud-detection-payments.md  ← hybrid+HITL flags, PCI-DSS, saga=yes, event-sourcing=yes
 ```
 
 ## How to install the plugin

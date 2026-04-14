@@ -46,7 +46,10 @@ Sessions are stored in `arch-advisor/<slug>/` relative to your current working d
 
 ## Testing
 
-- **Canonical test case**: [`teste-case.md`](teste-case.md) — pre-written responses for the Technical Document Critic Agent use case; run a session and compare outputs
+- **Test cases**: [`test-cases/`](test-cases/) — three scripted sessions with pre-written responses for reproducible testing:
+  - `01-support-routing-agent` — hybrid+HITL flags, SOC 2/PII, no saga, no event sourcing
+  - `02-medical-research-assistant` — no flags triggered, HIPAA/RAG multi-corpus, event sourcing required
+  - `03-fraud-detection-payments` — hybrid+HITL flags, PCI-DSS, saga rollback, full event sourcing
 - **Evaluation rubric**: [`COMPARACAO-VARIANTES.md`](COMPARACAO-VARIANTES.md) — 18-dimension rubric, /90 scale, for evaluating new plugin versions
 - **Reference outputs**: [`casos-de-referencia/`](casos-de-referencia/) — two validated executions (87/90 and 89/90) for regression comparison
 
