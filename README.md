@@ -50,8 +50,6 @@ Sessions are stored in `arch-advisor/<slug>/` relative to your current working d
   - `01-support-routing-agent` — hybrid+HITL flags, SOC 2/PII, no saga, no event sourcing
   - `02-medical-research-assistant` — no flags triggered, HIPAA/RAG multi-corpus, event sourcing required
   - `03-fraud-detection-payments` — hybrid+HITL flags, PCI-DSS, saga rollback, full event sourcing
-- **Evaluation rubric**: [`COMPARACAO-VARIANTES.md`](COMPARACAO-VARIANTES.md) — 18-dimension rubric, /90 scale, for evaluating new plugin versions
-- **Reference outputs**: [`casos-de-referencia/`](casos-de-referencia/) — two validated executions (87/90 and 89/90) for regression comparison
 
 ## Plugin structure
 
