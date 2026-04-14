@@ -19,8 +19,8 @@ At the start, determine the session mode from `$ARGUMENTS` and the pointer file 
 - Continue from where the session left off.
 
 **If `$ARGUMENTS` is `new`:**
-- Ask: "Before we start: what's a short name for this project or system? It'll be used as the folder name for this architecture session (e.g., `payment-processor`, `document-critic-agent`). If you don't have one yet, just press Enter and I'll use a timestamp."
-- Use the answer as `<session-slug>` (lowercase, hyphens, no spaces, no accents). If empty: use `session-<YYYYMMDD-HHmm>`.
+- Ask: "Before we start: what's a short name for this project or system? It'll be used as the folder name for this architecture session (e.g., `payment-processor`, `document-critic-agent`). Type `skip` if you don't have one yet and I'll generate a name from the date."
+- Use the answer as `<session-slug>` (lowercase, hyphens, no spaces, no accents). If the user types `skip` or any blank-equivalent: use `session-<YYYYMMDD-HHmm>`.
 - Proceed to initialize the session directory (see below), then start Phase 1.
 
 **If `$ARGUMENTS` is empty:**
