@@ -3,6 +3,8 @@
   "version": "5.0.0",
   "description": "Interactive architecture advisor for multi-agent LLM systems. Guides through structured discovery, tension resolution, requirements stress testing, and architecture proposal. Generates C4 diagram, ADR, decision matrix, and NFR checklist. Supports post-artifact deepening on domain-specific topics.",
   "author": {
-    "name": "Cezar"
+    "name": "Cezar Lenci",
+    "email": "cezar.lenci@gmail.com",
+    "url": "https://github.com/clenci/arch-advisor"
   }
 }
